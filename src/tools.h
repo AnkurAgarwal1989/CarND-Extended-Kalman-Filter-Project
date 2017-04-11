@@ -18,12 +18,12 @@ public:
   /**
   * A helper method to calculate RMSE.
   */
-  Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations, const std::vector<Eigen::VectorXd> &ground_truth);
+  Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations, const std::vector<Eigen::VectorXd> &ground_truth) const;
 
   /**
   * A helper method to calculate Jacobians.
   */
-  Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state);
+  Eigen::MatrixXd CalculateJacobian(const Eigen::VectorXd& x_state) const;
 
 };
 
