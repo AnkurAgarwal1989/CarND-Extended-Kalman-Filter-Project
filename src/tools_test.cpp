@@ -8,14 +8,28 @@ using Eigen::MatrixXd;
 using std::vector;
 using std::cout;
 using std::endl;
-void noDataCheck(Tools &tools) {
+void noDataCheck_RMSE(Tools &tools) {
     vector<VectorXd> a;
     vector<VectorXd> b;
 
     tools.CalculateRMSE(a, b);
 }
 
-void validCalcCheck(Tools &tools) {
+void sameDataCheck_RMSE(Tools &tools) {
+    vector<VectorXd> a;
+    vector<VectorXd> b;
+    VectorXd data(4);
+    data << 1.0, 2.0, 3.0, 4.0;
+    for (int i = 0; i < 3; ++i) {
+        a.push_back(data);
+        b.push_back(data);
+    }
+    VectorXd rmse = tools.CalculateRMSE(a, b);
+
+    cout << rmse << endl;
+}
+
+void validCalcCheck_RMSE(Tools &tools) {
     vector<VectorXd> a;
     vector<VectorXd> b;
     VectorXd data_a(4);
@@ -30,27 +44,26 @@ void validCalcCheck(Tools &tools) {
     std::cout << rmse << std::endl;
 }
 
-void sameDataCheck(Tools &tools) {
-    vector<VectorXd> a;
-    vector<VectorXd> b;
-    VectorXd data(4);
-    data << 1.0, 2.0, 3.0, 4.0;
-    for (int i = 0; i < 3; ++i) {
-        a.push_back(data);
-        b.push_back(data);
-    }
-    VectorXd rmse = tools.CalculateRMSE(a, b);
+void validCalcCheck_Jacobian(Tools &tools) {
+    VectorXd state(4);
+    state << 3, 5, 1.2, 2.4;
 
-    cout << rmse << endl;
+    MatrixXd Hj = tools.CalculateJacobian(state);
+
+    cout << "Hj:" << endl << Hj << endl;
 }
 
 void runToolsTests() {
     Tools tools_test;
     cout << "No data check" << endl;
-    noDataCheck(tools_test);
-    cout << "Same data check" << endl;
-    sameDataCheck(tools_test);
-    cout << "Valid Calculation check" << endl;
-    validCalcCheck(tools_test);
+    noDataCheck_RMSE(tools_test);
 
+    cout << "Same data check" << endl;
+    sameDataCheck_RMSE(tools_test);
+
+    cout << "Valid Calculation check for RMSE" << endl;
+    validCalcCheck_RMSE(tools_test);
+
+    cout << "Valid Calculation check for Jacobian" << endl;
+    validCalcCheck_Jacobian(tools_test);
 }
