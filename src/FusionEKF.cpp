@@ -11,7 +11,7 @@ using std::vector;
 /*
  * Constructor.
  */
-FusionEKF::FusionEKF() {
+FusionEKF::FusionEKF(): noise_ax(9) , noise_ay(9){
   is_initialized_ = false;
 
   previous_timestamp_ = 0;
@@ -33,7 +33,7 @@ FusionEKF::FusionEKF() {
         0, 0, 0, 1000;
 
   MatrixXd Q_ = MatrixXd::Zero(4, 4); //Initial Process CoVar Matrix
-
+ 
   R_laser_ = MatrixXd(2, 2); //Laser: Measurement covariance
   R_laser_ << 0.0225, 0,
               0, 0.0225;
@@ -48,9 +48,11 @@ FusionEKF::FusionEKF() {
     0, 0, 0.09;
 
   H_radar_ = tools.CalculateJacobian(x_);      //Radar: Measurement Jacobian
-    
+
   //Initializing the EKF
   ekf_.Init(x_, P_, F_, H_laser_, R_laser_, H_radar_, R_radar_, Q_);
+
+
 }
 
 /**
@@ -67,12 +69,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    ****************************************************************************/
   if (!is_initialized_) {
     /**
-    TODO:
       * Initialize the state ekf_.x_ with the first measurement.
       * Create the covariance matrix.
-      * Remember: you'll need to convert radar from polar to cartesian coordinates.
     */
-    // first measurement
     //cout << "EKF Initialization" << endl;
     
     previous_timestamp_ = measurement_pack.timestamp_;
@@ -113,8 +112,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   ekf_.F_(0, 2) = dt;
   ekf_.F_(1, 3) = dt;
 
-  float noise_ax = 9;
-  float noise_ay = 9;
   //Update the Process Noise covariance matrix Q
   ekf_.Q_ << dt_4 / 4 * noise_ax, 0, dt_3 / 2 * noise_ax, 0,
              0, dt_4 / 4 * noise_ay, 0, dt_3 / 2 * noise_ay,
