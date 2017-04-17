@@ -4,7 +4,7 @@
 
 class KalmanFilter {
 private:
-  void KalmanFilter::_Update(const Eigen::VectorXd &y, const Eigen::MatrixXd &H, const Eigen::MatrixXd &R);
+  void _Update(const Eigen::VectorXd &y, const Eigen::MatrixXd &H, const Eigen::MatrixXd &R);
 
 public:
   // state vector
