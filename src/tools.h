@@ -18,6 +18,11 @@ public:
   /**
   * A helper method to calculate RMSE.
   */
+  Eigen::VectorXd CalculateRMSE(const Eigen::VectorXd &estimations, const Eigen::VectorXd &ground_truth) const;
+
+  /**
+  * A helper method to calculate RMSE.
+  */
   Eigen::VectorXd CalculateRMSE(const std::vector<Eigen::VectorXd> &estimations, const std::vector<Eigen::VectorXd> &ground_truth) const;
 
   /**
