@@ -31,37 +31,37 @@ void KalmanFilter::Predict() {
   P_ = F_*P_*Ft + Q_;
 }
 
-void KalmanFilter::Update(const VectorXd &z) {
+//Utility function called by both Update and UpdateEKF
+void KalmanFilter::_Update(const VectorXd &y, const MatrixXd &H, const MatrixXd &R) {
   //Measurement Update
-  /*Linear State Update equations:
-  y = z - H*x_new
+  /*
   S = H*P_new*Ht + R
   K = P_new*Ht*inv(S)
-  
   x = x_new + K*y
   P = (I - K*H)*P_new
   */
-
-  VectorXd y = z - H_laser_*x_;
-  MatrixXd Ht = H_laser_.transpose();
-  MatrixXd S = H_laser_*P_*Ht + R_laser_;
-  MatrixXd K = P_*Ht*S.inverse();
+  MatrixXd Ht = H.transpose();
+  MatrixXd PHt = P_*Ht;
+  MatrixXd S = H*PHt + R;
+  MatrixXd K = PHt*S.inverse();
 
   long x_size = x_.size();
   MatrixXd I = MatrixXd::Identity(x_size, x_size);
   x_ = x_ + K*y;
-  P_ = (I - K*H_laser_)*P_;
+  P_ = (I - K*H)*P_;
+}
+
+void KalmanFilter::Update(const VectorXd &z) {
+  /*Linear State Update equations:
+  y = z - H*x_new
+  */
+  VectorXd y = z - H_laser_*x_;
+  _Update(y, H_laser_, R_laser_);
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  //Measurement Update
   /*Non-Linear State Update equations (EKF):
   y = z - Hj*x_new
-  S = H*P_new*Ht + R
-  K = P_new*Ht*inv(S)
-
-  x = x_new + K*y
-  P = (I - K*H)*P_new
   */
   float px = x_(0);
   float py = x_(1);
@@ -75,14 +75,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   float c = (px*vx + py*vy)/(a + 1e-7); 
   VectorXd hjx(3);
   hjx << a, b, c;
-  VectorXd y = z - hjx;
-  
-  MatrixXd Ht = H_radar_.transpose();
-  MatrixXd S = H_radar_*P_*Ht + R_radar_;
-  MatrixXd K = P_*Ht*S.inverse();
 
-  long x_size = x_.size();
-  MatrixXd I = MatrixXd::Identity(x_size, x_size);
-  x_ = x_ + K*y;
-  P_ = (I - K*H_radar_)*P_;
+  VectorXd y = z - hjx;
+  _Update(y, H_radar_, R_radar_);
 }
